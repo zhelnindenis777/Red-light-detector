@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детектор проезда на красный свет</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <div>
+            <h1>Детекция проезда на красный свет</h1>
+        </div>
+        <div class="status"><span></span> Система готова</div>
+    </div>
+</header>
+
+<main>
+    <section class="panel form-panel">
+        <div class="section-title">
+            <div><span>01</span><h2>Новый анализ</h2></div>
+            <p>Загрузите изображение или короткое видео перекрёстка.</p>
+        </div>
+
+        <form id="processForm">
+            <label class="upload-box">
+                <input type="file" name="media" id="media" accept="image/*,video/*" required>
+                <strong>Выберите файл</strong>
+                <span id="fileName">JPG, PNG, MP4, MOV, AVI или MKV</span>
+            </label>
+
+            <div class="form-grid">
+                <label>Стоп-линия, % высоты
+                    <input type="number" name="stop_line_percent" value="70" min="10" max="95">
+                </label>
+                <label>Порог уверенности
+                    <input type="number" name="confidence" value="0.35" min="0.15" max="0.9" step="0.05">
+                </label>
+                <label>Сигнал светофора
+                    <select name="light_mode" id="lightMode">
+                        <option value="red">Красный (контрольный тест)</option>
+                        <option value="auto">Определять по ROI</option>
+                        <option value="green">Не красный</option>
+                    </select>
+                </label>
+            </div>
+
+            <details>
+                <summary>Координаты области светофора для автоматического режима</summary>
+                <div class="roi-grid">
+                    <label>X <input type="number" name="roi_x" value="0" min="0"></label>
+                    <label>Y <input type="number" name="roi_y" value="0" min="0"></label>
+                    <label>Ширина <input type="number" name="roi_w" value="0" min="0"></label>
+                    <label>Высота <input type="number" name="roi_h" value="0" min="0"></label>
+                </div>
+            </details>
+
+            <button class="primary" type="submit">Запустить обработку</button>
+        </form>
+        <div id="message" class="message hidden"></div>
+    </section>
+
+    <section class="panel result-panel">
+        <div class="section-title">
+            <div><span>02</span><h2>Результат</h2></div>
+            <p>Рамки объектов и статистика обработки.</p>
+        </div>
+        <div id="resultEmpty" class="empty">Здесь появится обработанный файл</div>
+        <div id="resultContent" class="hidden">
+            <div id="resultMedia"></div>
+            <div class="stats">
+                <div><strong id="vehicleCount">0</strong><span>транспортных средств</span></div>
+                <div><strong id="violationCount">0</strong><span>возможных нарушений</span></div>
+                <div><strong id="processingTime">0</strong><span>секунд обработки</span></div>
+            </div>
+            <p id="classCounts" class="details-text"></p>
+        </div>
+    </section>
+
+    <section class="panel history-panel">
+        <div class="section-title history-heading">
+            <div><span>03</span><h2>История запросов</h2></div>
+            <div class="actions">
+                <a href="/export/excel">Excel</a>
+                <a href="/export/pdf">PDF</a>
+                <a href="/export/json">JSON</a>
+                <button id="clearHistory" class="danger" type="button">Очистить</button>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Дата</th><th>Файл</th><th>Тип</th><th>Транспорт</th><th>Нарушения</th><th>Результат</th></tr></thead>
+                <tbody id="historyBody"></tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
